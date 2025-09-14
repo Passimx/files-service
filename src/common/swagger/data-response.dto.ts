@@ -7,11 +7,18 @@ export class DataResponse<T> {
     readonly success: boolean;
 
     @ApiProperty()
-    readonly data: string | T;
+    readonly data: T;
 
-    constructor(data: string | T) {
-        this.success = typeof data !== 'string';
-
+    constructor(data: T, success: boolean = true) {
+        this.success = success;
         this.data = data;
+    }
+
+    static success<T>(data: T): DataResponse<T> {
+        return new DataResponse(data, true);
+    }
+
+    static error<T>(data: T): DataResponse<T> {
+        return new DataResponse(data, false);
     }
 }

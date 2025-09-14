@@ -18,8 +18,8 @@ export const Envs = {
         name: process.env.PG_DATABASE,
         username: process.env.PG_USERNAME,
         password: process.env.PG_PASSWORD,
-        migrationsRun: BooleanUtils.strToBoolWithDefault(process.env.PG_MIGRATIONS_RUN, false),
-        logging: BooleanUtils.strToBoolWithDefault(process.env.PG_LOGGINING, false),
+        migrationsRun: BooleanUtils.strToBoolWithDefault(false),
+        logging: BooleanUtils.strToBoolWithDefault(false),
     },
 
     kafka: {
@@ -27,7 +27,7 @@ export const Envs = {
         port: process.env.KAFKA_EXTERNAL_PORT,
         user: String(process.env.KAFKA_CLIENT_USERS),
         password: String(process.env.KAFKA_USER_PASSWORD),
-        kafkaIsConnect: BooleanUtils.strToBoolWithDefault(process.env.KAFKA_IS_CONNECT, false),
+        kafkaIsConnect: BooleanUtils.strToBoolWithDefault(false),
     },
 
     webdev: {
