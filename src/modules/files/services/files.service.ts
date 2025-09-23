@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectWebDAV, WebDAV } from 'nestjs-webdav';
 import { File } from '@nest-lab/fastify-multer';
-import { DataResponse } from '../../../common/swagger/data-response.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { DataResponse } from '../../../common/swagger/data-response.dto';
 
 @Injectable()
 export class FilesService {

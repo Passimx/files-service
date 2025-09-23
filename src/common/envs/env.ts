@@ -7,19 +7,8 @@ config();
 
 export const Envs = {
     main: {
-        host: process.env.APP_HOST || '0.0.0.0',
-        appPort: NumbersUtils.toNumberOrDefault(process.env.APP_PORT, 3000),
-        blackListTitles: process.env.FORBIDDEN_TITLES,
-    },
-
-    postgres: {
-        host: process.env.PG_HOST,
-        port: NumbersUtils.toNumberOrDefault(process.env.PG_PORT, 5432),
-        name: process.env.PG_DATABASE,
-        username: process.env.PG_USERNAME,
-        password: process.env.PG_PASSWORD,
-        migrationsRun: BooleanUtils.strToBoolWithDefault(false),
-        logging: BooleanUtils.strToBoolWithDefault(false),
+        host: process.env.APP_HOST_FILES || '0.0.0.0',
+        appPort: NumbersUtils.toNumberOrDefault(process.env.APP_PORT_FILES, 3000),
     },
 
     kafka: {
@@ -30,11 +19,10 @@ export const Envs = {
         kafkaIsConnect: BooleanUtils.strToBoolWithDefault(false),
     },
 
-    webdev: {
+    webdav: {
         host: process.env.WEBDAV_HOST,
         port: process.env.WEBDAV_PORT,
         user: String(process.env.USER_NAME_WEBDAV),
         password: String(process.env.PASSWORD_WEBDAV),
     },
-
 };

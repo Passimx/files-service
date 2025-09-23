@@ -1,7 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse } from '@nestjs/swagger';
 
-
 export function ApiDataArrayNumbers() {
     return applyDecorators(
         ApiExtraModels(),
