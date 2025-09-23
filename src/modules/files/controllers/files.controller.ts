@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { File, FileInterceptor } from '@nest-lab/fastify-multer';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
+import { FileInterceptor, File } from '@nest-lab/fastify-multer';
 import { FilesService } from '../services/files.service';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
 
@@ -11,7 +11,7 @@ export class FilesController {
     constructor(private readonly filesService: FilesService) {}
 
     @Post('upload')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file')) // 👈 один файл
     async upload(@UploadedFile() file: File): Promise<DataResponse<string>> {
         return await this.filesService.uploadFile(file);
     }
