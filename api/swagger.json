@@ -1,0 +1,71 @@
+{
+	"openapi": "3.0.0",
+	"paths": {
+		"/files/upload": {
+			"post": {
+				"operationId": "FilesController_upload",
+				"parameters": [],
+				"responses": {
+					"201": {
+						"description": ""
+					}
+				},
+				"tags": [
+					"Files"
+				]
+			}
+		},
+		"/files/{id}": {
+			"get": {
+				"operationId": "FilesController_downFile",
+				"parameters": [
+					{
+						"name": "id",
+						"required": true,
+						"in": "path",
+						"description": "File ID",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Returns the file as Buffer",
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Files"
+				]
+			}
+		}
+	},
+	"info": {
+		"title": "passim-file-service",
+		"description": "",
+		"version": "0.0.1",
+		"contact": {},
+		"license": {
+			"name": "UNLICENSED",
+			"url": "https://github.com/ramzini22"
+		}
+	},
+	"tags": [],
+	"servers": [
+		{
+			"url": "http://localhost:3000",
+			"description": "development"
+		}
+	],
+	"components": {
+		"schemas": {}
+	}
+}
