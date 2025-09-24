@@ -25,4 +25,11 @@ export const Envs = {
         user: String(process.env.USER_NAME_WEBDAV),
         password: String(process.env.PASSWORD_WEBDAV),
     },
+
+    swagger: {
+        path: process.env.SWAGGER_PATH || 'docs',
+        isWriteConfig: BooleanUtils.strToBoolWithDefault(process.env.SWAGGER_IS_WRITE_CONFIG, false),
+        url: `http://localhost:${process.env.APP_PORT ?? 3000}`,
+        description: 'development',
+    },
 };
