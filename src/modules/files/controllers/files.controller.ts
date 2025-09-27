@@ -1,9 +1,10 @@
-import { Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 import { FileInterceptor, File } from '@nest-lab/fastify-multer';
 import { FilesService } from '../services/files.service';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
+import { UploadDto } from '../dto/upload.dto';
 
 @ApiTags('Files')
 @Controller('files')
@@ -12,11 +13,12 @@ export class FilesController {
 
     @Post('upload')
     @UseInterceptors(FileInterceptor('file')) // 👈 один файл
-    async upload(@UploadedFile() file: File): Promise<DataResponse<string>> {
-        return await this.filesService.uploadFile(file);
+    async upload(@UploadedFile() file: File, @Body() body: UploadDto): Promise<DataResponse<string>> {
+        return await this.filesService.uploadFile(file, body);
     }
 
-    @ApiParam({ name: 'id', type: String, description: 'File ID' })
+    @ApiParam({ name: 'chatId', type: String, description: 'Chat ID' })
+    @ApiParam({ name: 'fileId', type: String, description: 'File ID' })
     @ApiResponse({
         status: 200,
         description: 'Returns the file as Buffer',
@@ -29,16 +31,8 @@ export class FilesController {
             },
         },
     })
-    @Get(':id')
-    async downFile(@Param('id') id: string, @Res() reply: FastifyReply) {
-        const response = await this.filesService.getFileData(id);
-
-        reply.headers({
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${id}"`,
-            'Content-Length': response.data.length,
-        });
-
-        reply.send(response.data);
+    @Get(':chatId/:fileId')
+    downFile(@Param('chatId') chatId: string, @Param('fileId') fileId: string, @Res() reply: FastifyReply) {
+        return this.filesService.downFile(chatId, fileId, reply);
     }
 }
