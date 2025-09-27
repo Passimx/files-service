@@ -5,6 +5,16 @@
 			"post": {
 				"operationId": "FilesController_upload",
 				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UploadDto"
+							}
+						}
+					}
+				},
 				"responses": {
 					"201": {
 						"description": ""
@@ -15,12 +25,21 @@
 				]
 			}
 		},
-		"/files/{id}": {
+		"/files/{chatId}/{fileId}": {
 			"get": {
 				"operationId": "FilesController_downFile",
 				"parameters": [
 					{
-						"name": "id",
+						"name": "chatId",
+						"required": true,
+						"in": "path",
+						"description": "Chat ID",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "fileId",
 						"required": true,
 						"in": "path",
 						"description": "File ID",
@@ -66,6 +85,18 @@
 		}
 	],
 	"components": {
-		"schemas": {}
+		"schemas": {
+			"UploadDto": {
+				"type": "object",
+				"properties": {
+					"chatId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"chatId"
+				]
+			}
+		}
 	}
 }

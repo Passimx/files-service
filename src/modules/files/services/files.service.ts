@@ -1,43 +1,68 @@
+import { createReadStream, createWriteStream, promises as fs, statSync } from 'fs';
+import { dirname, join } from 'path';
+import * as process from 'process';
+import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { InjectWebDAV, WebDAV } from 'nestjs-webdav';
 import { File } from '@nest-lab/fastify-multer';
-import { v4 as uuidv4 } from 'uuid';
+import { FastifyReply } from 'fastify';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
+import { UploadDto } from '../dto/upload.dto';
+import { logger } from '../../../common/logger/logger';
 
 @Injectable()
 export class FilesService {
-    constructor(
-        // @ts-ignore
-        @InjectWebDAV()
-        private readonly webDav: WebDAV,
-    ) {}
+    private readonly STORAGE_ROOT = join(process.cwd(), 'data', 'files');
 
-    async uploadFile(file: File): Promise<DataResponse<string>> {
+    public async uploadFile(file: File, body: UploadDto): Promise<DataResponse<string>> {
         try {
-            const filePath = uuidv4();
-            await this.webDav.putFileContents(filePath, file.buffer);
+            // 1. Генерируем хэш содержимого
+            const hash = createHash('sha256').update(file.buffer!).digest('hex');
+            const filePath = `/${body.chatId}/${hash}`;
 
-            return DataResponse.success(filePath);
+            try {
+                const stat = statSync(join(this.STORAGE_ROOT, filePath));
+                if (stat.size === file.size) return DataResponse.success(filePath);
+                return this.saveFile(filePath, file.buffer!);
+            } catch (e) {
+                return this.saveFile(filePath, file.buffer!);
+            }
         } catch (e) {
+            logger.error(e);
             return DataResponse.error(`Failed to upload file: ${e.message}`);
         }
     }
 
-    async getFileData(id: string): Promise<DataResponse<Buffer>> {
+    public downFile(chatId: string, fileId: string, reply: FastifyReply) {
         try {
-            const buffer = (await this.webDav.getFileContents(id)) as Buffer;
-            return DataResponse.success(buffer);
-        } catch (e) {
-            return DataResponse.error(Buffer.alloc(0));
+            const filePath = join(this.STORAGE_ROOT, `${chatId}/${fileId}`);
+
+            const stat = statSync(filePath);
+            const stream = createReadStream(filePath);
+
+            reply
+                .headers({
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Disposition': `attachment; filename="${fileId}"`,
+                    'Content-Length': stat.size,
+                })
+                .send(stream);
+        } catch (err) {
+            // если файл не найден
+            reply.status(404).send(DataResponse.error(`File not found`));
         }
     }
 
-    encodeRFC5987ValueChars(str: string): string {
-        return encodeURIComponent(str)
-            .replace(/['()]/g, escape)
+    private async saveFile(filePath: string, buffer: Buffer): Promise<DataResponse<string>> {
+        const absPath = join(this.STORAGE_ROOT, filePath);
 
-            .replace(/\*/g, '%2A')
+        await fs.mkdir(dirname(absPath), { recursive: true });
 
-            .replace(/%(?:7C|60|5E)/g, unescape);
+        return new Promise((resolve, reject) => {
+            const stream = createWriteStream(absPath);
+            stream.write(buffer);
+            stream.end();
+            stream.on('finish', () => resolve(DataResponse.success(filePath)));
+            stream.on('error', () => reject());
+        });
     }
 }
