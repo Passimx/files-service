@@ -4,5 +4,5 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UploadDto {
     @ApiProperty()
     @IsString()
-    readonly chatId?: string;
+    readonly chatId!: string;
 }
