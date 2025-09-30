@@ -57,8 +57,6 @@ export class App {
     }
 
     private logInformationAfterStartServer(url: string) {
-        logger.info(`Server is running on url: ${url} at ${Date()}. Version: '${version}'.`);
-
         if (Envs.swagger.isWriteConfig)
             logger.info(`Swagger is running on url: ${url}/${Envs.swagger.path} at ${Date()}. Version: '${version}'.`);
     }
