@@ -13,18 +13,17 @@ import { logger } from '../../../common/logger/logger';
 export class FilesService {
     private readonly STORAGE_ROOT = join(process.cwd(), 'data', 'files');
 
-    public async uploadFile(file: File, body: UploadDto): Promise<DataResponse<string>> {
+    public async uploadFile(file: File, { chatId }: UploadDto): Promise<DataResponse<string>> {
         try {
-            // 1. Генерируем хэш содержимого
             const hash = createHash('sha256').update(file.buffer!).digest('hex');
-            const filePath = `/${body.chatId}/${hash}`;
+            const filePath = `/${chatId}/${hash}`;
 
             try {
                 const stat = statSync(join(this.STORAGE_ROOT, filePath));
-                if (stat.size === file.size) return DataResponse.success(filePath);
-                return this.saveFile(filePath, file.buffer!);
+                if (stat.size === file.size) return DataResponse.success(hash);
+                return this.saveFile(hash, chatId, file.buffer!);
             } catch (e) {
-                return this.saveFile(filePath, file.buffer!);
+                return this.saveFile(hash, chatId, file.buffer!);
             }
         } catch (e) {
             logger.error(e);
@@ -52,8 +51,8 @@ export class FilesService {
         }
     }
 
-    private async saveFile(filePath: string, buffer: Buffer): Promise<DataResponse<string>> {
-        const absPath = join(this.STORAGE_ROOT, filePath);
+    private async saveFile(hash: string, chatId: string, buffer: Buffer): Promise<DataResponse<string>> {
+        const absPath = join(this.STORAGE_ROOT, chatId, hash);
 
         await fs.mkdir(dirname(absPath), { recursive: true });
 
@@ -61,7 +60,7 @@ export class FilesService {
             const stream = createWriteStream(absPath);
             stream.write(buffer);
             stream.end();
-            stream.on('finish', () => resolve(DataResponse.success(filePath)));
+            stream.on('finish', () => resolve(DataResponse.success(hash)));
             stream.on('error', () => reject());
         });
     }
