@@ -15,7 +15,6 @@ export class FilesService {
 
     public async uploadFile(file: File, { chatId }: UploadDto): Promise<DataResponse<string>> {
         try {
-            // 1. Генерируем хэш содержимого
             const hash = createHash('sha256').update(file.buffer!).digest('hex');
             const filePath = `/${chatId}/${hash}`;
 
