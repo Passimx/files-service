@@ -10,6 +10,7 @@ FROM base
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/*.json ./
+COPY --from=build /app/*.mobileconfig ./
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/api ./api
 EXPOSE 6030

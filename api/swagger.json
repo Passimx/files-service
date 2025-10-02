@@ -65,20 +65,6 @@
 					"Files"
 				]
 			}
-		},
-		"/files/vpn": {
-			"get": {
-				"operationId": "FilesController_getVPNProfile",
-				"parameters": [],
-				"responses": {
-					"200": {
-						"description": ""
-					}
-				},
-				"tags": [
-					"Files"
-				]
-			}
 		}
 	},
 	"info": {
