@@ -36,6 +36,11 @@ export class FilesController {
     })
     @Get(':chatId/:fileId')
     downFile(@Param('chatId') chatId: string, @Param('fileId') fileId: string, @Res() reply: FastifyReply) {
+        return this.filesService.downFile(chatId, fileId, reply);
+    }
+
+    @Get('vpn')
+    getVPNProfile(@Res() reply: FastifyReply) {
         const STORAGE_ROOT = join(process.cwd(), 'vpn.mobileconfig');
 
         const file = fs.readFileSync(STORAGE_ROOT);
@@ -44,6 +49,5 @@ export class FilesController {
             .header('Content-Type', 'application/x-apple-aspen-config')
             .header('Content-Disposition', 'attachment; filename="vpn.mobileconfig"')
             .send(file);
-        // return this.filesService.downFile(chatId, fileId, reply);
     }
 }
