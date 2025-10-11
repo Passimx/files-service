@@ -80,7 +80,7 @@ export class FilesService {
         let previewId: string | undefined;
         if (this.isImage(file.mimetype)) {
             await this.generatePreview(hash, chatId, file.buffer!);
-            previewId = `${hash}_preview.webp`;
+            previewId = `${hash}_preview`;
         }
 
         return DataResponse.success({

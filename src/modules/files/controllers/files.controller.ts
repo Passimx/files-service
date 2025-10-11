@@ -16,6 +16,21 @@ export class FilesController {
 
     @Post('upload')
     @UseInterceptors(FileInterceptor('file'))
+    @ApiResponse({
+        status: 200,
+        schema: {
+            properties: {
+                success: { type: 'boolean', example: true },
+                data: {
+                    properties: {
+                        fileId: { type: 'string' },
+                        previewId: { type: 'string' },
+                    },
+                    required: ['fileId'],
+                },
+            },
+        },
+    })
     async upload(
         @UploadedFile() file: File,
         @Body() body: UploadDto,
