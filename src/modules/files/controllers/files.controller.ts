@@ -7,7 +7,7 @@ import { FastifyReply } from 'fastify';
 import { File, FileInterceptor } from '@nest-lab/fastify-multer';
 import { FilesService } from '../services/files.service';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
-import { UploadDto } from '../dto/upload.dto';
+import { UploadDto, FileUploadResponseDto } from '../dto/upload.dto';
 
 @ApiTags('Files')
 @Controller('files')
@@ -15,8 +15,26 @@ export class FilesController {
     constructor(private readonly filesService: FilesService) {}
 
     @Post('upload')
-    @UseInterceptors(FileInterceptor('file')) // 👈 один файл
-    async upload(@UploadedFile() file: File, @Body() body: UploadDto): Promise<DataResponse<string>> {
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiResponse({
+        status: 200,
+        schema: {
+            properties: {
+                success: { type: 'boolean', example: true },
+                data: {
+                    properties: {
+                        fileId: { type: 'string' },
+                        previewId: { type: 'string' },
+                    },
+                    required: ['fileId'],
+                },
+            },
+        },
+    })
+    async upload(
+        @UploadedFile() file: File,
+        @Body() body: UploadDto,
+    ): Promise<DataResponse<FileUploadResponseDto | string>> {
         return await this.filesService.uploadFile(file, body);
     }
 

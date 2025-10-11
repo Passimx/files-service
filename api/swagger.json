@@ -16,8 +16,33 @@
 					}
 				},
 				"responses": {
-					"201": {
-						"description": ""
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										},
+										"data": {
+											"properties": {
+												"fileId": {
+													"type": "string"
+												},
+												"previewId": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"fileId"
+											]
+										}
+									}
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -59,6 +84,20 @@
 								}
 							}
 						}
+					}
+				},
+				"tags": [
+					"Files"
+				]
+			}
+		},
+		"/files/vpn": {
+			"get": {
+				"operationId": "FilesController_getVPNProfile",
+				"parameters": [],
+				"responses": {
+					"200": {
+						"description": ""
 					}
 				},
 				"tags": [

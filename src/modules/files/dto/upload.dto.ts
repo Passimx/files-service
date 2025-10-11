@@ -6,3 +6,11 @@ export class UploadDto {
     @IsString()
     readonly chatId!: string;
 }
+
+export class FileUploadResponseDto {
+    @ApiProperty()
+    readonly fileId!: string;
+
+    @ApiProperty()
+    readonly previewId?: string;
+}
