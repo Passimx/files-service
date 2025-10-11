@@ -38,3 +38,4 @@ junit.xml
 # ENV
 .env
 !/src/modules/logs
+/data/
