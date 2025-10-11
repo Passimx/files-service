@@ -61,7 +61,6 @@ export class FilesService {
         }
     }
 
-
     private async saveFileWithPreview(
         hash: string,
         chatId: string,
