@@ -25,7 +25,7 @@ export class FilesService {
                     // Файл уже существует
                     let previewId: string | undefined;
                     if (this.isImage(file.mimetype)) {
-                        previewId = `${hash}_preview.webp`;
+                        previewId = `${hash}_preview`;
                     }
                     return DataResponse.success({
                         fileId: hash,
@@ -61,24 +61,6 @@ export class FilesService {
         }
     }
 
-    public downFilePreview(chatId: string, previewId: string, reply: FastifyReply) {
-        try {
-            const previewPath = join(this.STORAGE_ROOT, `${chatId}/${previewId}`);
-            const stat = statSync(previewPath);
-            const stream = createReadStream(previewPath);
-
-            reply
-                .headers({
-                    'Content-Type': 'image/webp',
-                    'Content-Disposition': `inline; filename="${previewId}"`,
-                    'Content-Length': stat.size,
-                    'Cache-Control': 'public, max-age=31536000', // Кешируем превью на год
-                })
-                .send(stream);
-        } catch (err) {
-            reply.status(404).send(DataResponse.error(`Preview not found`));
-        }
-    }
 
     private async saveFileWithPreview(
         hash: string,
@@ -113,7 +95,7 @@ export class FilesService {
     }
 
     private async generatePreview(hash: string, chatId: string, buffer: Buffer): Promise<void> {
-        const previewPath = join(this.STORAGE_ROOT, chatId, `${hash}_preview.webp`);
+        const previewPath = join(this.STORAGE_ROOT, chatId, `${hash}_preview`);
         await sharp(buffer)
             .resize(300, 300, { fit: 'inside', withoutEnlargement: true })
             .webp({ quality: 80 })

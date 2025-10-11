@@ -25,39 +25,6 @@
 				]
 			}
 		},
-		"/files/preview/{chatId}/{previewId}": {
-			"get": {
-				"operationId": "FilesController_downPreview",
-				"parameters": [
-					{
-						"name": "chatId",
-						"required": true,
-						"in": "path",
-						"description": "Chat ID",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "previewId",
-						"required": true,
-						"in": "path",
-						"description": "Preview ID",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": ""
-					}
-				},
-				"tags": [
-					"Files"
-				]
-			}
-		},
 		"/files/{chatId}/{fileId}": {
 			"get": {
 				"operationId": "FilesController_downFile",

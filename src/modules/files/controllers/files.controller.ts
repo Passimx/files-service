@@ -24,13 +24,6 @@ export class FilesController {
     }
 
     @ApiParam({ name: 'chatId', type: String, description: 'Chat ID' })
-    @ApiParam({ name: 'previewId', type: String, description: 'Preview ID' })
-    @Get('preview/:chatId/:previewId')
-    downPreview(@Param('chatId') chatId: string, @Param('previewId') previewId: string, @Res() reply: FastifyReply) {
-        return this.filesService.downFilePreview(chatId, previewId, reply);
-    }
-
-    @ApiParam({ name: 'chatId', type: String, description: 'Chat ID' })
     @ApiParam({ name: 'fileId', type: String, description: 'File ID' })
     @ApiResponse({
         status: 200,
