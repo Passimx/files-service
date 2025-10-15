@@ -96,6 +96,7 @@ export class FilesService {
     private async generatePreview(hash: string, chatId: string, buffer: Buffer): Promise<void> {
         const previewPath = join(this.STORAGE_ROOT, chatId, `${hash}_preview`);
         await sharp(buffer)
+            .rotate()
             .resize(300, 300, { fit: 'inside', withoutEnlargement: true })
             .webp({ quality: 80 })
             .toFile(previewPath);
