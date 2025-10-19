@@ -136,7 +136,7 @@ export class FilesService {
                     reject(err);
                 })
                 .screenshots({
-                    timestamps: ['00:00:03'],
+                    timestamps: ['50%'],
                     filename: tempImageName,
                     folder: dirname(tempImagePath),
                     size: '300x?',
