@@ -53,7 +53,7 @@ export class FilesService {
 
             reply
                 .headers({
-                    'Content-Type': 'image/webp',
+                    'Content-Type': 'application/octet-stream',
                     'Content-Disposition': `attachment; filename="${fileId}"`,
                     'Content-Length': stat.size,
                 })
