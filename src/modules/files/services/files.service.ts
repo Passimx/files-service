@@ -26,7 +26,7 @@ export class FilesService {
                     // Файл уже существует
                     let previewId: string | undefined;
 
-                    if (this.isImage(file.mimetype)) {
+                    if (this.isImage(file.mimetype) || this.isVideo(file.mimetype)) {
                         previewId = `${hash}_preview`;
                     }
                     return DataResponse.success({
