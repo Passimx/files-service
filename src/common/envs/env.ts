@@ -7,7 +7,7 @@ config();
 
 export const Envs = {
     main: {
-        host: process.env.APP_HOST_FILES || '0.0.0.0',
+        host: '0.0.0.0',
         appPort: NumbersUtils.toNumberOrDefault(process.env.APP_PORT_FILES, 3000),
     },
 
