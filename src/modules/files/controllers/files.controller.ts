@@ -1,13 +1,10 @@
-import { join } from 'path';
-import * as fs from 'fs';
-import process from 'process';
 import { Body, Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 import { File, FileInterceptor } from '@nest-lab/fastify-multer';
 import { FilesService } from '../services/files.service';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
-import { UploadDto, FileUploadResponseDto } from '../dto/upload.dto';
+import { FileUploadResponseDto, UploadDto } from '../dto/upload.dto';
 
 @ApiTags('Files')
 @Controller('files')
@@ -55,17 +52,5 @@ export class FilesController {
     @Get(':chatId/:fileId')
     downFile(@Param('chatId') chatId: string, @Param('fileId') fileId: string, @Res() reply: FastifyReply) {
         return this.filesService.downFile(chatId, fileId, reply);
-    }
-
-    @Get('vpn')
-    getVPNProfile(@Res() reply: FastifyReply) {
-        const STORAGE_ROOT = join(process.cwd(), 'vpn.mobileconfig');
-
-        const file = fs.readFileSync(STORAGE_ROOT);
-
-        reply
-            .header('Content-Type', 'application/x-apple-aspen-config')
-            .header('Content-Disposition', 'attachment; filename="vpn.mobileconfig"')
-            .send(file);
     }
 }
