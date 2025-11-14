@@ -30,9 +30,6 @@
 											"properties": {
 												"fileId": {
 													"type": "string"
-												},
-												"previewId": {
-													"type": "string"
 												}
 											},
 											"required": [

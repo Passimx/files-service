@@ -5,10 +5,8 @@ import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
 import { FastifyReply } from 'fastify';
-import sharp from 'sharp';
-import ffmpeg from 'fluent-ffmpeg';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
-import { UploadDto, FileUploadResponseDto } from '../dto/upload.dto';
+import { FileUploadResponseDto, UploadDto } from '../dto/upload.dto';
 import { logger } from '../../../common/logger/logger';
 
 @Injectable()
@@ -22,16 +20,10 @@ export class FilesService {
 
             try {
                 const stat = statSync(join(this.STORAGE_ROOT, filePath));
+                // Файл уже существует
                 if (stat.size === file.size) {
-                    // Файл уже существует
-                    let previewId: string | undefined;
-
-                    if (this.isImage(file.mimetype) || this.isVideo(file.mimetype)) {
-                        previewId = `${hash}_preview`;
-                    }
                     return DataResponse.success({
                         fileId: hash,
-                        previewId,
                     });
                 }
                 return this.saveFileWithPreview(hash, chatId, file);
@@ -79,74 +71,8 @@ export class FilesService {
             stream.on('error', () => reject());
         });
 
-        let previewId: string | undefined;
-        let isSupportedMedia = false;
-
-        switch (true) {
-            case this.isImage(file.mimetype):
-                await this.generateImagePreview(hash, chatId, file.buffer!);
-                isSupportedMedia = true;
-                break;
-
-            case this.isVideo(file.mimetype):
-                await this.generateVideoPreview(hash, chatId, absPath);
-                isSupportedMedia = true;
-                break;
-
-            default:
-                new DataResponse('Mimetype не найдем');
-        }
-
-        if (isSupportedMedia) {
-            previewId = `${hash}_preview`;
-        }
-
         return DataResponse.success({
             fileId: hash,
-            previewId,
         });
-    }
-
-    private isImage(mimetype?: string): boolean {
-        return mimetype ? mimetype.startsWith('image/') : false;
-    }
-
-    private isVideo(mimetype?: string): boolean {
-        return mimetype ? mimetype.startsWith('video/') : false;
-    }
-
-    private async generateImagePreview(hash: string, chatId: string, input: Buffer | string): Promise<void> {
-        const previewPath = join(this.STORAGE_ROOT, chatId, `${hash}_preview`);
-
-        await sharp(input)
-            .rotate()
-            .resize(300, 300, { fit: 'inside', withoutEnlargement: true })
-            .webp({ quality: 80 })
-            .toFile(previewPath);
-    }
-
-    private async generateVideoPreview(hash: string, chatId: string, videoFilePath: string): Promise<void> {
-        const tempImageName = `${hash}_temp.png`;
-        const tempImagePath = join(this.STORAGE_ROOT, chatId, tempImageName);
-
-        await new Promise<void>((resolve, reject) => {
-            ffmpeg(videoFilePath)
-                .on('end', () => resolve())
-                .on('error', (err) => {
-                    reject(err);
-                })
-                .screenshots({
-                    timestamps: ['50%'],
-                    filename: tempImageName,
-                    folder: dirname(tempImagePath),
-                    size: '300x?',
-                });
-        });
-
-        try {
-            await this.generateImagePreview(hash, chatId, tempImagePath);
-        } finally {
-            await fs.unlink(tempImagePath).catch((e) => new DataResponse(`Failed to delete temp file: ${e.message}`));
-        }
     }
 }
