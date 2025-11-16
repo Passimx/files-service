@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 import { File, FileInterceptor } from '@nest-lab/fastify-multer';
 import { FilesService } from '../services/files.service';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
 import { FileUploadResponseDto, UploadDto } from '../dto/upload.dto';
+import { ApiFileUpload } from '../../../common/swagger/api-file-upload.decorator';
+import { ApiFileDownload } from '../../../common/swagger/api-file-download.decorator';
 
 @ApiTags('Files')
 @Controller('files')
@@ -13,21 +15,7 @@ export class FilesController {
 
     @Post('upload')
     @UseInterceptors(FileInterceptor('file'))
-    @ApiResponse({
-        status: 200,
-        schema: {
-            properties: {
-                success: { type: 'boolean', example: true },
-                data: {
-                    properties: {
-                        fileId: { type: 'string' },
-                        previewId: { type: 'string' },
-                    },
-                    required: ['fileId'],
-                },
-            },
-        },
-    })
+    @ApiFileUpload()
     async upload(
         @UploadedFile() file: File,
         @Body() body: UploadDto,
@@ -35,20 +23,7 @@ export class FilesController {
         return await this.filesService.uploadFile(file, body);
     }
 
-    @ApiParam({ name: 'chatId', type: String, description: 'Chat ID' })
-    @ApiParam({ name: 'fileId', type: String, description: 'File ID' })
-    @ApiResponse({
-        status: 200,
-        description: 'Returns the file as Buffer',
-        content: {
-            'application/octet-stream': {
-                schema: {
-                    type: 'string',
-                    format: 'binary',
-                },
-            },
-        },
-    })
+    @ApiFileDownload()
     @Get(':chatId/:fileId')
     downFile(@Param('chatId') chatId: string, @Param('fileId') fileId: string, @Res() reply: FastifyReply) {
         return this.filesService.downFile(chatId, fileId, reply);

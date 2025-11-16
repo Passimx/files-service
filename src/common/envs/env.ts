@@ -9,7 +9,7 @@ config();
 export const Envs = {
     main: {
         host: '0.0.0.0',
-        appPort: NumbersUtils.toNumberOrDefault(process.env.FILES_SERVICE_APP_PORT, 3000),
+        appPort: NumbersUtils.toNumberOrDefault(process.env.FILES_SERVICE_APP_PORT, 6030),
     },
 
     kafka: {
