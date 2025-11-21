@@ -1,3 +1,4 @@
 export enum TopicsEnum {
-    AUDIO_ANALYSIS = 'audio_analysis',
+    AUDIO_TRANSCRIPTION_REQUEST = 'audio_transcription_request',
+    AUDIO_TRANSCRIPTION_RESPONSE = 'audio_transcription_response',
 }

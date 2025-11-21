@@ -1,4 +1,5 @@
 import * as process from 'process';
+import { join } from 'path';
 import { config } from 'dotenv';
 import { NumbersUtils } from '../utils/numbers.utils';
 import { BooleanUtils } from './boolean.utils';
@@ -16,7 +17,7 @@ export const Envs = {
         port: process.env.KAFKA_EXTERNAL_PORT,
         user: String(process.env.KAFKA_CLIENT_USERS),
         password: String(process.env.KAFKA_USER_PASSWORD),
-        kafkaIsConnect: BooleanUtils.strToBoolWithDefault(false),
+        kafkaIsConnect: BooleanUtils.strToBoolWithDefault(process.env.KAFKA_IS_CONNECT, false),
     },
 
     webdav: {
@@ -31,5 +32,9 @@ export const Envs = {
         isWriteConfig: BooleanUtils.strToBoolWithDefault(process.env.SWAGGER_IS_WRITE_CONFIG, false),
         url: `http://localhost:${process.env.APP_PORT ?? 3000}`,
         description: 'development',
+    },
+
+    vosk: {
+        path: join(process.cwd(), process.env.VOSK_MODEL_PATH || 'vosk-model-small-ru-0.22'),
     },
 };
