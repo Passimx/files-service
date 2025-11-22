@@ -1,13 +1,9 @@
-FROM node:20.10.0-alpine as base
-
-RUN apk add --no-cache \
+FROM node:20.10.0-slim AS base
+RUN apt-get update && apt-get install -y \
     ffmpeg \
-    python3 \
-    make \
-    g++ \
-    musl-dev
+    && rm -rf /var/lib/apt/lists/*
 
-FROM base as build
+FROM base AS build
 WORKDIR /app
 COPY . ./
 RUN npm ci
@@ -20,5 +16,7 @@ COPY --from=build /app/*.json ./
 COPY --from=build /app/*.mobileconfig ./
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/api ./api
+COPY --from=build /app/vosk-model-small-ru-0.22 ./vosk-model-small-ru-0.22
+
 EXPOSE 6030
 CMD ["node","dist/src/main"]

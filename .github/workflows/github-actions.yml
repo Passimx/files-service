@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - test*
+      - quick*
+      - test
 
 jobs:
   build:
@@ -24,4 +25,5 @@ jobs:
       IMAGE_NAME: ${{ vars.IMAGE_NAME }}
     secrets:
       DOCKER_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+      GIT_HUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
       GIT_HUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
