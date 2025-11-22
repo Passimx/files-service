@@ -1,3 +1,3 @@
 export enum EventsEnum {
-    AUDIO_TRANSCRIBED = 'audio_transcribed',
+    ANALYZE_AUDIO = 'analyze_audio',
 }

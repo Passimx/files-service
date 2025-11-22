@@ -118,45 +118,6 @@
 				"required": [
 					"chatId"
 				]
-			},
-			"DataResponse": {
-				"type": "object",
-				"properties": {
-					"success": {
-						"type": "boolean"
-					},
-					"data": {
-						"type": "object"
-					}
-				},
-				"required": [
-					"success",
-					"data"
-				]
-			},
-			"MessageDto": {
-				"type": "object",
-				"properties": {
-					"to": {
-						"type": "string"
-					},
-					"event": {
-						"type": "string",
-						"enum": [
-							"analyze_audio",
-							"transcribe_audio",
-							"audio_transcribed"
-						]
-					},
-					"data": {
-						"$ref": "#/components/schemas/DataResponse"
-					}
-				},
-				"required": [
-					"to",
-					"event",
-					"data"
-				]
 			}
 		}
 	}

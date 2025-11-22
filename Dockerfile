@@ -1,11 +1,5 @@
 FROM node:20.10.0-alpine as base
-
-RUN apk add --no-cache \
-    ffmpeg \
-    python3 \
-    make \
-    g++ \
-    musl-dev
+RUN apk add --no-cache ffmpeg
 
 FROM base as build
 WORKDIR /app
