@@ -1,27 +1,17 @@
 FROM node:20.10.0-slim AS base
-
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    python3 \
-    make \
-    g++ \
-    libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
 COPY . ./
+RUN npm ci
 RUN npm run build
 
 FROM base
 WORKDIR /app
-
 COPY --from=build /app/node_modules ./node_modules
-
-RUN npm rebuild vosk-koffi
-
 COPY --from=build /app/*.json ./
 COPY --from=build /app/*.mobileconfig ./
 COPY --from=build /app/dist ./dist
