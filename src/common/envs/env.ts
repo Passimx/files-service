@@ -35,6 +35,6 @@ export const Envs = {
     },
 
     vosk: {
-        path: join(process.cwd(), process.env.VOSK_MODEL_PATH || 'vosk-model-small-ru-0.22'),
+        path: join(process.cwd(), process.env.VOSK_MODEL_PATH!),
     },
 };

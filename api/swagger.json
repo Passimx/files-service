@@ -143,6 +143,8 @@
 					"event": {
 						"type": "string",
 						"enum": [
+							"analyze_audio",
+							"transcribe_audio",
 							"audio_transcribed"
 						]
 					},
