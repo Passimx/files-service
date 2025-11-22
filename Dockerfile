@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y \
 FROM base AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-# Устанавливаем зависимости БЕЗ --ignore-scripts, чтобы нативные модули собрались правильно
 RUN npm ci
 COPY . ./
 RUN npm run build
@@ -19,13 +18,10 @@ RUN npm run build
 FROM base
 WORKDIR /app
 
-# Копируем node_modules из build stage
 COPY --from=build /app/node_modules ./node_modules
 
-# Пересобираем нативные модули для текущей платформы
 RUN npm rebuild vosk-koffi
 
-# Копируем остальные файлы
 COPY --from=build /app/*.json ./
 COPY --from=build /app/*.mobileconfig ./
 COPY --from=build /app/dist ./dist
