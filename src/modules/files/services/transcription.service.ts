@@ -81,7 +81,7 @@ export class TranscriptionService implements OnModuleInit {
                             fs.unlink(tempInputPath).catch(() => {});
                             resolve(tempOutputPath);
                         })
-                        .on('error', (error) => {
+                        .on('error', (error: Error) => {
                             fs.unlink(tempInputPath).catch(() => {});
                             reject(error);
                         })
