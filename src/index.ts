@@ -21,9 +21,9 @@ export class App {
         const app = await App.createNestApp();
 
         app.enableCors({
-            origin: ['http://localhost:3006', 'http://localhost:4173', 'https://passimx.ru'], // Разрешаем запросы только с этого домена
+            origin: true,
+            credentials: true,
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-            credentials: true, // Разрешаем использование кук и токенов
         });
 
         app.useGlobalPipes(
