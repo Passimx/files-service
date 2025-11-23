@@ -5,9 +5,11 @@ RUN apt-get update && apt-get install -y \
 
 FROM base AS build
 WORKDIR /app
-COPY . ./
 
+COPY package.json package-lock.json ./
 RUN npm ci
+RUN ls -la node_modules/fluent-ffmpeg || (echo "fluent-ffmpeg not found" && npm list && exit 1)
+COPY . ./
 RUN npm run build
 
 FROM base
