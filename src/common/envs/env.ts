@@ -13,10 +13,10 @@ export const Envs = {
     },
 
     kafka: {
-        host: process.env.KAFKA_HOST,
-        port: process.env.KAFKA_EXTERNAL_PORT,
-        user: String(process.env.KAFKA_CLIENT_USERS),
-        password: String(process.env.KAFKA_USER_PASSWORD),
+        host: process.env.KAFKA_HOST || 'kafka',
+        port: NumbersUtils.toNumberOrDefault(process.env.KAFKA_EXTERNAL_PORT, 9094),
+        user: process.env.KAFKA_CLIENT_USERS || 'user',
+        password: process.env.KAFKA_USER_PASSWORD || 'bitnami',
         kafkaIsConnect: BooleanUtils.strToBoolWithDefault(process.env.KAFKA_IS_CONNECT, true),
     },
 
