@@ -1,14 +1,13 @@
-FROM node:20.10.0-slim AS base
+FROM node:20.10.0-slim as base
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-FROM base AS build
+FROM base as build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
-RUN ls -la node_modules/fluent-ffmpeg || (echo "fluent-ffmpeg not found" && npm list && exit 1)
+RUN npm ci || npm install
 COPY . ./
 RUN npm run build
 
@@ -20,6 +19,5 @@ COPY --from=build /app/*.mobileconfig ./
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/api ./api
 COPY --from=build /app/vosk-model-small-ru-0.22 ./vosk-model-small-ru-0.22
-
 EXPOSE 6030
 CMD ["node","dist/src/main"]
