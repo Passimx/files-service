@@ -7,12 +7,23 @@ FROM base AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
+
 COPY . ./
+
 RUN npm run build
 
 FROM base
 WORKDIR /app
+
+# Устанавливаем системные библиотеки для vosk-koffi
+# libc6 и libstdc++6 уже включены в base, но убеждаемся что они есть
+RUN apt-get update && apt-get install -y \
+    libc6 \
+    libstdc++6 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/*.json ./
 COPY --from=build /app/*.mobileconfig ./
