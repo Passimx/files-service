@@ -5,8 +5,9 @@ RUN apt-get update && apt-get install -y \
 
 FROM base AS build
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
 COPY . ./
-RUN npm ci
 RUN npm run build
 
 FROM base
