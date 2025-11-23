@@ -14,6 +14,8 @@ import { DataResponse } from '../../../common/swagger/data-response.dto';
 export class TranscriptionService implements OnModuleInit {
     private voskModel: vosk.Model | null = null;
     private readonly STORAGE_ROOT = join(process.cwd(), 'data', 'files');
+    private isProcessing = false;
+    private processingQueue: Array<() => Promise<void>> = [];
 
     constructor(private readonly queueService: QueueService) {}
 
@@ -36,7 +38,7 @@ export class TranscriptionService implements OnModuleInit {
             const wavBuffer = readFileSync(wavFilePath);
             const wavData = wavBuffer.slice(44);
 
-            const chunkSize = 4000;
+            const chunkSize = 16000;
             let finalResult = '';
 
             for (let i = 0; i < wavData.length; i += chunkSize) {
@@ -47,6 +49,11 @@ export class TranscriptionService implements OnModuleInit {
                     if (result?.text) {
                         finalResult += result.text + ' ';
                     }
+                }
+
+                // Небольшая пауза каждые 10 чанков для снижения нагрузки на CPU
+                if (i > 0 && (i / chunkSize) % 10 === 0) {
+                    await new Promise((resolve) => setTimeout(resolve, 10));
                 }
             }
 
@@ -176,38 +183,67 @@ export class TranscriptionService implements OnModuleInit {
     }
 
     async processTranscriptionRequest(request: TranscriptionRequestDto): Promise<void> {
-        try {
-            const filePath = join(this.STORAGE_ROOT, request.chatId, request.fileId);
+        // Добавляем запрос в очередь для последовательной обработки (не более 1 одновременно)
+        return new Promise((resolve) => {
+            this.processingQueue.push(async () => {
+                try {
+                    const filePath = join(this.STORAGE_ROOT, request.chatId, request.fileId);
 
-            let audioBuffer: Buffer;
-            try {
-                audioBuffer = readFileSync(filePath);
-            } catch (fileError: unknown) {
-                const errorMessage = fileError instanceof Error ? fileError.message : String(fileError);
-                throw new Error(`File not found: ${filePath} - ${errorMessage}`);
-            }
+                    let audioBuffer: Buffer;
+                    try {
+                        audioBuffer = readFileSync(filePath);
+                    } catch (fileError: unknown) {
+                        const errorMessage = fileError instanceof Error ? fileError.message : String(fileError);
+                        throw new Error(`File not found: ${filePath} - ${errorMessage}`);
+                    }
 
-            const transcription = await this.transcribe(audioBuffer);
+                    const transcription = await this.transcribe(audioBuffer);
 
-            const response: TranscriptionResponseDto = {
-                fileId: request.fileId,
-                transcription,
-            };
+                    const response: TranscriptionResponseDto = {
+                        fileId: request.fileId,
+                        transcription,
+                    };
 
-            this.queueService.sendMessage(
-                TopicsEnum.AUDIO_TRANSCRIPTION_RESPONSE,
-                request.chatId,
-                EventsEnum.AUDIO_TRANSCRIBED,
-                DataResponse.success(response),
-            );
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            this.queueService.sendMessage(
-                TopicsEnum.AUDIO_TRANSCRIPTION_RESPONSE,
-                request.chatId,
-                EventsEnum.AUDIO_TRANSCRIBED,
-                DataResponse.error(`Transcription failed: ${errorMessage}`),
-            );
+                    this.queueService.sendMessage(
+                        TopicsEnum.AUDIO_TRANSCRIPTION_RESPONSE,
+                        request.chatId,
+                        EventsEnum.AUDIO_TRANSCRIBED,
+                        DataResponse.success(response),
+                    );
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    this.queueService.sendMessage(
+                        TopicsEnum.AUDIO_TRANSCRIPTION_RESPONSE,
+                        request.chatId,
+                        EventsEnum.AUDIO_TRANSCRIBED,
+                        DataResponse.error(`Transcription failed: ${errorMessage}`),
+                    );
+                } finally {
+                    resolve();
+                }
+            });
+
+            this.processQueue();
+        });
+    }
+
+    private async processQueue(): Promise<void> {
+        if (this.isProcessing || this.processingQueue.length === 0) {
+            return;
+        }
+
+        this.isProcessing = true;
+        const task = this.processingQueue.shift();
+
+        if (task) {
+            await task();
+        }
+
+        this.isProcessing = false;
+
+        // Обрабатываем следующий элемент в очереди
+        if (this.processingQueue.length > 0) {
+            await this.processQueue();
         }
     }
 }
